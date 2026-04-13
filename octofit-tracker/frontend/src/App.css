@@ -1,0 +1,116 @@
+:root {
+  --octo-ink: #11253d;
+  --octo-muted: #5e7084;
+  --octo-accent: #0f9d8a;
+  --octo-accent-strong: #0b776a;
+  --octo-link: #0a5fbe;
+  --octo-heading: #0d2f52;
+  --octo-table-head: #e7f2ff;
+  --octo-table-row: #fafdff;
+  --octo-bg: #f4f8fb;
+}
+
+body {
+  margin: 0;
+  background:
+    radial-gradient(1500px 600px at 8% -10%, rgba(15, 157, 138, 0.2), transparent 55%),
+    radial-gradient(1200px 700px at 95% 0%, rgba(17, 37, 61, 0.12), transparent 52%),
+    var(--octo-bg);
+  color: var(--octo-ink);
+}
+
+.app-shell {
+  min-height: 100vh;
+}
+
+.app-nav {
+  background: linear-gradient(100deg, #11253d 0%, #1b3a5a 100%);
+  border-bottom: 3px solid rgba(15, 157, 138, 0.5);
+}
+
+.brand-logo {
+  width: 34px;
+  height: 34px;
+  object-fit: cover;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.28);
+}
+
+.navbar .nav-link {
+  color: rgba(255, 255, 255, 0.86);
+}
+
+.navbar .nav-link:hover,
+.navbar .nav-link:focus {
+  color: #fff;
+}
+
+.octo-card {
+  border: 0;
+  border-radius: 18px;
+  background: linear-gradient(180deg, #ffffff 0%, #f9fcff 100%);
+}
+
+.table-shell {
+  background: #fff;
+}
+
+.octo-table thead th {
+  background-color: var(--octo-table-head);
+  white-space: nowrap;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--octo-muted);
+}
+
+.octo-table tbody tr:nth-child(even) {
+  background-color: var(--octo-table-row);
+}
+
+.octo-table tbody td {
+  font-weight: 500;
+}
+
+.btn-primary {
+  background-color: var(--octo-accent);
+  border-color: var(--octo-accent);
+}
+
+.btn-primary:hover {
+  background-color: var(--octo-accent-strong);
+  border-color: var(--octo-accent-strong);
+}
+
+.btn-danger {
+  background-color: #c4452f;
+  border-color: #c4452f;
+}
+
+.btn-danger:hover {
+  background-color: #a93a27;
+  border-color: #a93a27;
+}
+
+h1,
+h2,
+h3,
+.h4,
+.h5 {
+  color: var(--octo-heading);
+}
+
+a,
+.link-primary {
+  color: var(--octo-link) !important;
+}
+
+a:hover,
+.link-primary:hover {
+  color: #084c99 !important;
+}
+
+.modal-content {
+  border-radius: 16px;
+  border: 0;
+}
