@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { getApiUrl } from '../services/api';
 
 /**
  * Workouts Component
@@ -13,21 +14,22 @@ function Workouts() {
     const fetchWorkouts = async () => {
       try {
         setLoading(true);
-        const apiUrl = getApiUrl('/api/workouts/');
-        console.log('Fetching workouts from:', apiUrl);
+        const url = getApiUrl('/api/workouts/');
+        console.log('[Workouts] Fetching from:', url);
         
-        const response = await fetch(apiUrl);
+        const response = await fetch(url);
         if (!response.ok) throw new Error(`HTTP ${response.status}`);
         
         const data = await response.json();
-        console.log('Workouts API response:', data);
+        console.log('[Workouts] Raw data:', data);
         
         // Handle both paginated and plain array responses
         const results = data.results || data;
-        setWorkouts(Array.isArray(results) ? results : []);
-        console.log('Workouts state updated:', Array.isArray(results) ? results : []);
+        const workoutsArray = Array.isArray(results) ? results : [];
+        setWorkouts(workoutsArray);
+        console.log('[Workouts] Processed data:', workoutsArray);
       } catch (err) {
-        console.error('Error fetching workouts:', err);
+        console.error('[Workouts] Error:', err);
         setError(err.message);
       } finally {
         setLoading(false);
@@ -42,13 +44,13 @@ function Workouts() {
 
   return (
     <div className="container mt-5">
-      <h1 className="mb-4">Workouts</h1>
+      <h1 className="mb-4">💪 Workouts</h1>
       {workouts.length === 0 ? (
         <p>No workouts found.</p>
       ) : (
         <div className="table-responsive">
           <table className="table table-striped table-hover">
-            <thead>
+            <thead className="table-dark">
               <tr>
                 <th>Workout Name</th>
                 <th>Description</th>
@@ -69,17 +71,6 @@ function Workouts() {
       )}
     </div>
   );
-}
-
-/**
- * Helper function to get API URL with Codespace support
- */
-function getApiUrl(endpoint) {
-  const codespace = process.env.REACT_APP_CODESPACE_NAME;
-  if (codespace) {
-    return `https://${codespace}-8000.app.github.dev${endpoint}`;
-  }
-  return `http://localhost:8000${endpoint}`;
 }
 
 export default Workouts;

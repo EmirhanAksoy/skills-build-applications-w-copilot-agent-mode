@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { getApiUrl } from '../services/api';
 
 /**
  * Leaderboard Component
@@ -13,21 +14,22 @@ function Leaderboard() {
     const fetchLeaderboard = async () => {
       try {
         setLoading(true);
-        const apiUrl = getApiUrl('/api/leaderboard/');
-        console.log('Fetching leaderboard from:', apiUrl);
+        const url = getApiUrl('/api/leaderboard/');
+        console.log('[Leaderboard] Fetching from:', url);
         
-        const response = await fetch(apiUrl);
+        const response = await fetch(url);
         if (!response.ok) throw new Error(`HTTP ${response.status}`);
         
         const data = await response.json();
-        console.log('Leaderboard API response:', data);
+        console.log('[Leaderboard] Raw data:', data);
         
         // Handle both paginated and plain array responses
         const results = data.results || data;
-        setLeaderboard(Array.isArray(results) ? results : []);
-        console.log('Leaderboard state updated:', Array.isArray(results) ? results : []);
+        const leaderboardArray = Array.isArray(results) ? results : [];
+        setLeaderboard(leaderboardArray);
+        console.log('[Leaderboard] Processed data:', leaderboardArray);
       } catch (err) {
-        console.error('Error fetching leaderboard:', err);
+        console.error('[Leaderboard] Error:', err);
         setError(err.message);
       } finally {
         setLoading(false);
@@ -42,13 +44,13 @@ function Leaderboard() {
 
   return (
     <div className="container mt-5">
-      <h1 className="mb-4">Leaderboard</h1>
+      <h1 className="mb-4">🏆 Leaderboard</h1>
       {leaderboard.length === 0 ? (
         <p>No leaderboard data available.</p>
       ) : (
         <div className="table-responsive">
           <table className="table table-striped table-hover">
-            <thead>
+            <thead className="table-dark">
               <tr>
                 <th>Rank</th>
                 <th>User Email</th>
@@ -69,17 +71,6 @@ function Leaderboard() {
       )}
     </div>
   );
-}
-
-/**
- * Helper function to get API URL with Codespace support
- */
-function getApiUrl(endpoint) {
-  const codespace = process.env.REACT_APP_CODESPACE_NAME;
-  if (codespace) {
-    return `https://${codespace}-8000.app.github.dev${endpoint}`;
-  }
-  return `http://localhost:8000${endpoint}`;
 }
 
 export default Leaderboard;

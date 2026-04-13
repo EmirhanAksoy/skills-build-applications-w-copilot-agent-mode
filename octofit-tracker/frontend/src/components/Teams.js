@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { getApiUrl } from '../services/api';
 
 /**
  * Teams Component
@@ -13,21 +14,22 @@ function Teams() {
     const fetchTeams = async () => {
       try {
         setLoading(true);
-        const apiUrl = getApiUrl('/api/teams/');
-        console.log('Fetching teams from:', apiUrl);
+        const url = getApiUrl('/api/teams/');
+        console.log('[Teams] Fetching from:', url);
         
-        const response = await fetch(apiUrl);
+        const response = await fetch(url);
         if (!response.ok) throw new Error(`HTTP ${response.status}`);
         
         const data = await response.json();
-        console.log('Teams API response:', data);
+        console.log('[Teams] Raw data:', data);
         
         // Handle both paginated and plain array responses
         const results = data.results || data;
-        setTeams(Array.isArray(results) ? results : []);
-        console.log('Teams state updated:', Array.isArray(results) ? results : []);
+        const teamsArray = Array.isArray(results) ? results : [];
+        setTeams(teamsArray);
+        console.log('[Teams] Processed data:', teamsArray);
       } catch (err) {
-        console.error('Error fetching teams:', err);
+        console.error('[Teams] Error:', err);
         setError(err.message);
       } finally {
         setLoading(false);
@@ -42,13 +44,13 @@ function Teams() {
 
   return (
     <div className="container mt-5">
-      <h1 className="mb-4">Teams</h1>
+      <h1 className="mb-4">👥 Teams</h1>
       {teams.length === 0 ? (
         <p>No teams found.</p>
       ) : (
         <div className="table-responsive">
           <table className="table table-striped table-hover">
-            <thead>
+            <thead className="table-dark">
               <tr>
                 <th>Team Name</th>
                 <th>Description</th>
@@ -67,17 +69,6 @@ function Teams() {
       )}
     </div>
   );
-}
-
-/**
- * Helper function to get API URL with Codespace support
- */
-function getApiUrl(endpoint) {
-  const codespace = process.env.REACT_APP_CODESPACE_NAME;
-  if (codespace) {
-    return `https://${codespace}-8000.app.github.dev${endpoint}`;
-  }
-  return `http://localhost:8000${endpoint}`;
 }
 
 export default Teams;

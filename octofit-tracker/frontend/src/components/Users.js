@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { getApiUrl } from '../services/api';
 
 /**
  * Users Component
@@ -13,21 +14,22 @@ function Users() {
     const fetchUsers = async () => {
       try {
         setLoading(true);
-        const apiUrl = getApiUrl('/api/users/');
-        console.log('Fetching users from:', apiUrl);
+        const url = getApiUrl('/api/users/');
+        console.log('[Users] Fetching from:', url);
         
-        const response = await fetch(apiUrl);
+        const response = await fetch(url);
         if (!response.ok) throw new Error(`HTTP ${response.status}`);
         
         const data = await response.json();
-        console.log('Users API response:', data);
+        console.log('[Users] Raw data:', data);
         
         // Handle both paginated and plain array responses
         const results = data.results || data;
-        setUsers(Array.isArray(results) ? results : []);
-        console.log('Users state updated:', Array.isArray(results) ? results : []);
+        const usersArray = Array.isArray(results) ? results : [];
+        setUsers(usersArray);
+        console.log('[Users] Processed data:', usersArray);
       } catch (err) {
-        console.error('Error fetching users:', err);
+        console.error('[Users] Error:', err);
         setError(err.message);
       } finally {
         setLoading(false);
@@ -42,13 +44,13 @@ function Users() {
 
   return (
     <div className="container mt-5">
-      <h1 className="mb-4">Users</h1>
+      <h1 className="mb-4">👤 Users</h1>
       {users.length === 0 ? (
         <p>No users found.</p>
       ) : (
         <div className="table-responsive">
           <table className="table table-striped table-hover">
-            <thead>
+            <thead className="table-dark">
               <tr>
                 <th>Name</th>
                 <th>Email</th>
@@ -69,17 +71,6 @@ function Users() {
       )}
     </div>
   );
-}
-
-/**
- * Helper function to get API URL with Codespace support
- */
-function getApiUrl(endpoint) {
-  const codespace = process.env.REACT_APP_CODESPACE_NAME;
-  if (codespace) {
-    return `https://${codespace}-8000.app.github.dev${endpoint}`;
-  }
-  return `http://localhost:8000${endpoint}`;
 }
 
 export default Users;
