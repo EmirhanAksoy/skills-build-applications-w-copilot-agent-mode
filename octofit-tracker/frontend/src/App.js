@@ -1,83 +1,21 @@
-import { useState, useEffect } from 'react';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import './App.css';
-import api from './services/api';
-import AppNavbar from './components/AppNavbar';
-import ConfirmModal from './components/ConfirmModal';
-import DataTableCard from './components/DataTableCard';
-import WorkoutFormCard from './components/WorkoutFormCard';
+import Navigation from './components/Navigation';
+import Activities from './components/Activities';
+import Teams from './components/Teams';
+import Users from './components/Users';
+import Leaderboard from './components/Leaderboard';
+import Workouts from './components/Workouts';
+import Home from './components/Home';
 
 function App() {
-  const [showResetModal, setShowResetModal] = useState(false);
-  const [activities, setActivities] = useState([]);
-  const [teams, setTeams] = useState([]);
-  const [leaderboard, setLeaderboard] = useState([]);
-  const [workouts, setWorkouts] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [apiAvailable, setApiAvailable] = useState(true);
-
-  useEffect(() => {
-    const loadData = async () => {
-      setIsLoading(true);
-      const isHealthy = await api.checkHealth();
-      setApiAvailable(isHealthy);
-
-      if (isHealthy) {
-        const [activitiesData, teamsData, leaderboardData, workoutsData] = await Promise.all([
-          api.fetchActivities(),
-          api.fetchTeams(),
-          api.fetchLeaderboard(),
-          api.fetchWorkouts(),
-        ]);
-        setActivities(activitiesData);
-        setTeams(teamsData);
-        setLeaderboard(leaderboardData);
-        setWorkouts(workoutsData);
-      }
-      setIsLoading(false);
-    };
-
-    loadData();
-  }, []);
-
-  const handleFormSubmit = (event) => {
-    event.preventDefault();
-    setShowResetModal(true);
-  };
+  console.log('App component mounted');
+  console.log('Codespace:', process.env.REACT_APP_CODESPACE_NAME);
 
   return (
-    <div className="app-shell" id="top">
-      <AppNavbar />
-
-      <main className="container py-4 py-lg-5">
-        {isLoading && (
-          <div className="alert alert-info" role="alert">
-            <strong>Loading...</strong> Fetching data from backend API.
-          </div>
-        )}
-        {!apiAvailable && !isLoading && (
-          <div className="alert alert-warning" role="alert">
-            <strong>Warning:</strong> Backend API unavailable. Showing fallback data.
-            <br />
-            Make sure Django server is running on <code>http://localhost:8000</code> or set <code>REACT_APP_API_URL</code> env variable.
-          </div>
-        )}
-        <div className="row mb-4 align-items-end g-3">
-          <div className="col-lg-8">
-            <h1 className="display-5 fw-bold text-body-emphasis mb-2">OctoFit Team Dashboard</h1>
-            <p className="lead text-secondary mb-0">
-              Real-time data from Django backend API. {apiAvailable ? '✓ API Connected' : '✗ API Disconnected'}
-            </p>
-          </div>
-          <div className="col-lg-4 d-flex justify-content-lg-end">
-            <button
-              type="button"
-              className="btn btn-danger"
-              onClick={() => setShowResetModal(true)}
-            >
-              Open Reset Modal
-            </button>
-          </div>
-        </div>
+    <BrowserRouter>
+      <div className="app-shell">
+        <Navigation />
 
         <div className="row g-4">
           <DataTableCard

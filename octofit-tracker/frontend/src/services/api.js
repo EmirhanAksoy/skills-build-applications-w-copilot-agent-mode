@@ -1,112 +1,143 @@
 /**
  * API Service for OctoFit Tracker
- * Handles all backend API calls and data transformation
+ * Handles all backend API calls with Codespace support
  */
 
-const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:8000';
+/**
+ * Get the API URL based on environment
+ * Supports both localhost and Codespace URLs
+ */
+export function getApiUrl(path = '') {
+  const codespace = process.env.REACT_APP_CODESPACE_NAME;
+  let baseUrl;
+
+  if (codespace) {
+    // Use Codespace URL with https
+    baseUrl = `https://${codespace}-8000.app.github.dev`;
+    console.log(`[API] Using Codespace URL: ${baseUrl}`);
+  } else {
+    // Use localhost for development
+    baseUrl = process.env.REACT_APP_API_URL || 'http://localhost:8000';
+    console.log(`[API] Using localhost URL: ${baseUrl}`);
+  }
+
+  const fullUrl = `${baseUrl}${path}`;
+  console.log(`[API] Full URL: ${fullUrl}`);
+  return fullUrl;
+}
 
 const api = {
   /**
    * Fetch activities from backend
-   * @returns {Promise<Array>} Transformed activities data
+   * @returns {Promise<Array>} Raw activities data
    */
   async fetchActivities() {
     try {
-      const response = await fetch(`${API_BASE_URL}/api/activities/`);
+      const url = getApiUrl('/api/activities/');
+      console.log('[Activities] Fetching from:', url);
+      const response = await fetch(url);
       if (!response.ok) throw new Error(`HTTP ${response.status}`);
       const data = await response.json();
+      console.log('[Activities] Raw response:', data);
       
-      return data.map((item) => [
-        item.user_email || 'Unknown',
-        item.type || 'N/A',
-        item.duration ? `${item.duration} min` : 'N/A',
-        item.date || 'N/A',
-      ]);
+      // Handle both paginated and plain array responses
+      const activities = data.results || data;
+      console.log('[Activities] Processed data:', activities);
+      return Array.isArray(activities) ? activities : [];
     } catch (error) {
-      console.error('Failed to fetch activities:', error);
+      console.error('[Activities] Error:', error);
       return [];
     }
   },
 
   /**
    * Fetch teams from backend
-   * @returns {Promise<Array>} Transformed teams data
+   * @returns {Promise<Array>} Raw teams data
    */
   async fetchTeams() {
     try {
-      const response = await fetch(`${API_BASE_URL}/api/teams/`);
+      const url = getApiUrl('/api/teams/');
+      console.log('[Teams] Fetching from:', url);
+      const response = await fetch(url);
       if (!response.ok) throw new Error(`HTTP ${response.status}`);
       const data = await response.json();
+      console.log('[Teams] Raw response:', data);
       
-      return data.map((item) => [
-        item.name || 'Unknown',
-        item.description || 'N/A',
-      ]);
+      // Handle both paginated and plain array responses
+      const teams = data.results || data;
+      console.log('[Teams] Processed data:', teams);
+      return Array.isArray(teams) ? teams : [];
     } catch (error) {
-      console.error('Failed to fetch teams:', error);
+      console.error('[Teams] Error:', error);
       return [];
     }
   },
 
   /**
    * Fetch users from backend
-   * @returns {Promise<Array>} Transformed users data
+   * @returns {Promise<Array>} Raw users data
    */
   async fetchUsers() {
     try {
-      const response = await fetch(`${API_BASE_URL}/api/users/`);
+      const url = getApiUrl('/api/users/');
+      console.log('[Users] Fetching from:', url);
+      const response = await fetch(url);
       if (!response.ok) throw new Error(`HTTP ${response.status}`);
       const data = await response.json();
+      console.log('[Users] Raw response:', data);
       
-      return data.map((item) => [
-        item.name || 'Unknown',
-        item.email || 'N/A',
-        item.team_name || 'N/A',
-      ]);
+      // Handle both paginated and plain array responses
+      const users = data.results || data;
+      console.log('[Users] Processed data:', users);
+      return Array.isArray(users) ? users : [];
     } catch (error) {
-      console.error('Failed to fetch users:', error);
+      console.error('[Users] Error:', error);
       return [];
     }
   },
 
   /**
-   * Fetch leaderboard data from backend
-   * @returns {Promise<Array>} Transformed leaderboard data
+   * Fetch leaderboard data from backend  
+   * @returns {Promise<Array>} Raw leaderboard data
    */
   async fetchLeaderboard() {
     try {
-      const response = await fetch(`${API_BASE_URL}/api/leaderboard/`);
+      const url = getApiUrl('/api/leaderboard/');
+      console.log('[Leaderboard] Fetching from:', url);
+      const response = await fetch(url);
       if (!response.ok) throw new Error(`HTTP ${response.status}`);
       const data = await response.json();
+      console.log('[Leaderboard] Raw response:', data);
       
-      return data.map((item) => [
-        item.rank || 'N/A',
-        item.user_email || 'Unknown',
-        item.points || 0,
-      ]);
+      // Handle both paginated and plain array responses
+      const leaderboard = data.results || data;
+      console.log('[Leaderboard] Processed data:', leaderboard);
+      return Array.isArray(leaderboard) ? leaderboard : [];
     } catch (error) {
-      console.error('Failed to fetch leaderboard:', error);
+      console.error('[Leaderboard] Error:', error);
       return [];
     }
   },
 
   /**
    * Fetch workouts from backend
-   * @returns {Promise<Array>} Transformed workouts data
+   * @returns {Promise<Array>} Raw workouts data
    */
   async fetchWorkouts() {
     try {
-      const response = await fetch(`${API_BASE_URL}/api/workouts/`);
+      const url = getApiUrl('/api/workouts/');
+      console.log('[Workouts] Fetching from:', url);
+      const response = await fetch(url);
       if (!response.ok) throw new Error(`HTTP ${response.status}`);
       const data = await response.json();
+      console.log('[Workouts] Raw response:', data);
       
-      return data.map((item) => [
-        item.name || 'Unknown',
-        item.description || 'N/A',
-        item.suggested_for || 'All',
-      ]);
+      // Handle both paginated and plain array responses
+      const workouts = data.results || data;
+      console.log('[Workouts] Processed data:', workouts);
+      return Array.isArray(workouts) ? workouts : [];
     } catch (error) {
-      console.error('Failed to fetch workouts:', error);
+      console.error('[Workouts] Error:', error);
       return [];
     }
   },
@@ -117,10 +148,13 @@ const api = {
    */
   async checkHealth() {
     try {
-      const response = await fetch(`${API_BASE_URL}/api/`);
+      const url = getApiUrl('/api/');
+      console.log('[Health] Checking API health at:', url);
+      const response = await fetch(url);
+      console.log('[Health] API is', response.ok ? 'UP ✓' : 'DOWN ✗');
       return response.ok;
     } catch (error) {
-      console.warn('API health check failed:', error);
+      console.error('[Health] API health check failed:', error);
       return false;
     }
   },
