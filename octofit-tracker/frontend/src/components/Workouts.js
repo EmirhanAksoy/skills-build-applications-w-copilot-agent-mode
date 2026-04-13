@@ -4,6 +4,7 @@ import { getApiUrl } from '../services/api';
 /**
  * Workouts Component
  * Displays workouts fetched from backend API
+ * Codespace URL format: https://{codespace}-8000.app.github.dev/api/workouts
  */
 function Workouts() {
   const [workouts, setWorkouts] = useState([]);

@@ -4,6 +4,7 @@ import { getApiUrl } from '../services/api';
 /**
  * Teams Component
  * Displays teams fetched from backend API
+ * Codespace URL format: https://{codespace}-8000.app.github.dev/api/teams
  */
 function Teams() {
   const [teams, setTeams] = useState([]);

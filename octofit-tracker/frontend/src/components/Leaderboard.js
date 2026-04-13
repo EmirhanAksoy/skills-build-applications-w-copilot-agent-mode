@@ -4,6 +4,7 @@ import { getApiUrl } from '../services/api';
 /**
  * Leaderboard Component
  * Displays leaderboard fetched from backend API
+ * Codespace URL format: https://{codespace}-8000.app.github.dev/api/leaderboard
  */
 function Leaderboard() {
   const [leaderboard, setLeaderboard] = useState([]);
