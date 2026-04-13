@@ -1,9 +1,10 @@
 from djongo import models
 
+
 class User(models.Model):
     email = models.EmailField(unique=True)
     name = models.CharField(max_length=100)
-    team = models.CharField(max_length=50)
+    team_name = models.CharField(max_length=50)
     def __str__(self):
         return self.email
 
@@ -14,12 +15,12 @@ class Team(models.Model):
         return self.name
 
 class Activity(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user_email = models.EmailField()
     type = models.CharField(max_length=50)
     duration = models.IntegerField()  # minutes
     date = models.DateField()
     def __str__(self):
-        return f"{self.user.email} - {self.type}"
+        return f"{self.user_email} - {self.type}"
 
 class Workout(models.Model):
     name = models.CharField(max_length=100)
@@ -29,8 +30,8 @@ class Workout(models.Model):
         return self.name
 
 class Leaderboard(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user_email = models.EmailField()
     points = models.IntegerField()
     rank = models.IntegerField()
     def __str__(self):
-        return f"{self.user.email} - {self.rank}"
+        return f"{self.user_email} - {self.rank}"
