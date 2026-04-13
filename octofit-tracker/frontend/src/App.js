@@ -1,5 +1,6 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import './App.css';
+import api from './services/api';
 import AppNavbar from './components/AppNavbar';
 import ConfirmModal from './components/ConfirmModal';
 import DataTableCard from './components/DataTableCard';
@@ -7,25 +8,36 @@ import WorkoutFormCard from './components/WorkoutFormCard';
 
 function App() {
   const [showResetModal, setShowResetModal] = useState(false);
+  const [activities, setActivities] = useState([]);
+  const [teams, setTeams] = useState([]);
+  const [leaderboard, setLeaderboard] = useState([]);
+  const [workouts, setWorkouts] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [apiAvailable, setApiAvailable] = useState(true);
 
-  const activities = [
-    ['Iron Man', 'Run', '30 min', 'Marvel'],
-    ['Captain America', 'Cycle', '45 min', 'Marvel'],
-    ['Batman', 'Swim', '25 min', 'DC'],
-    ['Superman', 'Walk', '60 min', 'DC'],
-  ];
+  useEffect(() => {
+    const loadData = async () => {
+      setIsLoading(true);
+      const isHealthy = await api.checkHealth();
+      setApiAvailable(isHealthy);
 
-  const teams = [
-    ['Marvel', '2', 'Beginner + Intermediate'],
-    ['DC', '2', 'Intermediate + Advanced'],
-  ];
+      if (isHealthy) {
+        const [activitiesData, teamsData, leaderboardData, workoutsData] = await Promise.all([
+          api.fetchActivities(),
+          api.fetchTeams(),
+          api.fetchLeaderboard(),
+          api.fetchWorkouts(),
+        ]);
+        setActivities(activitiesData);
+        setTeams(teamsData);
+        setLeaderboard(leaderboardData);
+        setWorkouts(workoutsData);
+      }
+      setIsLoading(false);
+    };
 
-  const leaderboard = [
-    ['1', 'Iron Man', '120', '+10'],
-    ['2', 'Captain America', '110', '+6'],
-    ['3', 'Batman', '100', '+4'],
-    ['4', 'Superman', '90', '+3'],
-  ];
+    loadData();
+  }, []);
 
   const handleFormSubmit = (event) => {
     event.preventDefault();
@@ -37,11 +49,23 @@ function App() {
       <AppNavbar />
 
       <main className="container py-4 py-lg-5">
+        {isLoading && (
+          <div className="alert alert-info" role="alert">
+            <strong>Loading...</strong> Fetching data from backend API.
+          </div>
+        )}
+        {!apiAvailable && !isLoading && (
+          <div className="alert alert-warning" role="alert">
+            <strong>Warning:</strong> Backend API unavailable. Showing fallback data.
+            <br />
+            Make sure Django server is running on <code>http://localhost:8000</code> or set <code>REACT_APP_API_URL</code> env variable.
+          </div>
+        )}
         <div className="row mb-4 align-items-end g-3">
           <div className="col-lg-8">
             <h1 className="display-5 fw-bold text-body-emphasis mb-2">OctoFit Team Dashboard</h1>
             <p className="lead text-secondary mb-0">
-              Bootstrap-first layout for activities, teams, leaderboard, forms, cards, links, buttons, and modal actions.
+              Real-time data from Django backend API. {apiAvailable ? '✓ API Connected' : '✗ API Disconnected'}
             </p>
           </div>
           <div className="col-lg-4 d-flex justify-content-lg-end">
@@ -62,7 +86,7 @@ function App() {
             subtitle="Consistent table layout with striped rows."
             linkLabel="View Activity API"
             linkHref="/api/activities/"
-            columns={['Member', 'Activity', 'Duration', 'Team']}
+            columns={['User', 'Activity', 'Duration', 'Date']}
             rows={activities}
             actionLabel="Export Activities"
           />
@@ -73,7 +97,7 @@ function App() {
             subtitle="Unified data grid with matching spacing and typography."
             linkLabel="View Teams API"
             linkHref="/api/teams/"
-            columns={['Team', 'Members', 'Level Mix']}
+            columns={['Team', 'Description']}
             rows={teams}
             actionLabel="Manage Teams"
           />
@@ -84,9 +108,20 @@ function App() {
             subtitle="Same table styling used across all data components."
             linkLabel="View Leaderboard API"
             linkHref="/api/leaderboard/"
-            columns={['Rank', 'Member', 'Points', 'Delta']}
+            columns={['Rank', 'Member', 'Points']}
             rows={leaderboard}
             actionLabel="Refresh Rankings"
+          />
+
+          <DataTableCard
+            id="workouts"
+            title="Workouts"
+            subtitle="Personalized workout suggestions by team."
+            linkLabel="View Workouts API"
+            linkHref="/api/workouts/"
+            columns={['Workout', 'Description', 'Suggested For']}
+            rows={workouts}
+            actionLabel="Add Workout"
           />
 
           <WorkoutFormCard onSubmit={handleFormSubmit} />
